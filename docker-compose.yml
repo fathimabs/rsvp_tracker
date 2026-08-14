@@ -1,3 +1,4 @@
+
 services:
   mysql:
     image: mysql:8.0
@@ -13,10 +14,11 @@ services:
       - db_data:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
+      start_period: 60s
 
   backend:
     build:
@@ -32,8 +34,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
 
   frontend:
     build:
@@ -48,3 +49,4 @@ services:
 
 volumes:
   db_data:
+

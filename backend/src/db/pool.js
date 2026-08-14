@@ -1,3 +1,4 @@
+
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
@@ -10,10 +11,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// The mysql container becomes reachable before it's actually ready to
-// accept queries (init.sql is still being applied). We retry with a
-// short backoff instead of failing on the first connection attempt.
-async function waitForDb(retries = 20, delayMs = 2000) {
+async function waitForDb(retries = 80, delayMs = 3000) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const conn = await pool.getConnection();
@@ -29,3 +27,4 @@ async function waitForDb(retries = 20, delayMs = 2000) {
 }
 
 module.exports = { pool, waitForDb };
+

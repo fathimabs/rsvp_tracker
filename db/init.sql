@@ -1,7 +1,3 @@
--- Runs automatically on first container boot (mounted into
--- /docker-entrypoint-initdb.d by docker-compose). Schema only —
--- seed users are inserted at backend startup (see backend/src/db/seed.js)
--- so passwords are bcrypt-hashed in code rather than hardcoded here.
 
 CREATE TABLE IF NOT EXISTS users (
   id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -24,7 +20,10 @@ CREATE TABLE IF NOT EXISTS events (
   CONSTRAINT fk_events_creator
     FOREIGN KEY (created_by) REFERENCES users(id)
     ON DELETE CASCADE,
-  INDEX idx_events_time (event_time)
+  INDEX idx_events_time (event_time),
+  -- prevents the same event (same title, time, and location) from
+  -- being created twice, by anyone
+  UNIQUE KEY uq_event_title_time_location (title, event_time, location)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS rsvps (
@@ -40,7 +39,8 @@ CREATE TABLE IF NOT EXISTS rsvps (
   CONSTRAINT fk_rsvps_user
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE,
-  -- One RSVP per user per event. Re-RSVPing updates this row instead
-  -- of creating a duplicate/conflicting one.
+  -- One RSVP per user per event.
   UNIQUE KEY uq_rsvp_event_user (event_id, user_id)
 ) ENGINE=InnoDB;
+EOF
+
