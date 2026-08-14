@@ -80,6 +80,11 @@ router.post('/', async (req, res) => {
     res.status(201).json(rows[0]);
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
+      if (err.sqlMessage?.includes('uq_owner_time_location')) {
+        return res.status(409).json({
+          error: 'You already have an event at this date, time, and location'
+        });
+      }
       return res.status(409).json({
         error: 'An event with this title, date/time, and location already exists'
       });
@@ -87,7 +92,6 @@ router.post('/', async (req, res) => {
     throw err;
   }
 });
-
 async function loadOwnedEvent(req, res) {
   const { id } = req.params;
   const [rows] = await pool.query('SELECT * FROM events WHERE id = ?', [id]);
@@ -127,8 +131,13 @@ router.put('/:id', async (req, res) => {
 
     const [rows] = await pool.query('SELECT * FROM events WHERE id = ?', [event.id]);
     res.json(rows[0]);
-  } catch (err) {
+  }  catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
+      if (err.sqlMessage?.includes('uq_owner_time_location')) {
+        return res.status(409).json({
+          error: 'You already have an event at this date, time, and location'
+        });
+      }
       return res.status(409).json({
         error: 'An event with this title, date/time, and location already exists'
       });

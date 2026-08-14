@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS events (
   INDEX idx_events_time (event_time),
   -- prevents the same event (same title, time, and location) from
   -- being created twice, by anyone
-  UNIQUE KEY uq_event_title_time_location (title, event_time, location)
+  UNIQUE KEY uq_event_title_time_location (title, event_time, location),
+    -- one organizer can't run two different events at the same time+place
+  UNIQUE KEY uq_owner_time_location (created_by, event_time, location)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS rsvps (
