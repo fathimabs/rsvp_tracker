@@ -73,25 +73,16 @@ rsvps   (id, event_id -> events.id, user_id -> users.id, status ENUM, ...)
 
 ### API
 
-**Auth**
-
-- `POST /api/auth/login` — no auth required, returns `{ token, user }`
-
-- `GET /api/auth/me` — requires auth, returns the current user from the token
-
-**Events**
-
-- `GET /api/events` — requires auth, list all events, supports `?search=` on title/location
-
-- `GET /api/events/:id` — requires auth, full event detail + all RSVPs + `myRsvp`
-
-- `POST /api/events` — requires auth, create an event; returns 409 on duplicate event or double-booking
-
-- `PUT /api/events/:id` — requires auth + must be the creator, edit an event; same 409 checks apply
-
-- `DELETE /api/events/:id` — requires auth + must be the creator, deletes the event (RSVPs cascade automatically)
-
-- `POST /api/events/:id/rsvp` — requires auth, body `{ status }`, upserts the caller's RSVP
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| POST | /api/auth/login | – | returns `{ token, user }` |
+| GET | /api/auth/me | ✔ | returns current user from token |
+| GET | /api/events | ✔ | list, `?search=` filters title/location |
+| GET | /api/events/:id | ✔ | detail + all RSVPs + `myRsvp` |
+| POST | /api/events | ✔ | create; 409 on duplicate event or double-booking |
+| PUT | /api/events/:id | ✔ owner | edit; same 409 checks apply |
+| DELETE | /api/events/:id | ✔ owner | delete (cascades RSVPs) |
+| POST | /api/events/:id/rsvp | ✔ | body `{status}`, upserts |
 
 Errors return `{ "error": "message" }` with an appropriate status code (400 validation, 401 auth, 403 ownership, 404 not found, 409 conflict, 500 unexpected).
 
