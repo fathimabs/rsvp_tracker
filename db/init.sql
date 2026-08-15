@@ -44,5 +44,4 @@ CREATE TABLE IF NOT EXISTS rsvps (
   -- One RSVP per user per event.
   UNIQUE KEY uq_rsvp_event_user (event_id, user_id)
 ) ENGINE=InnoDB;
-EOF
 
